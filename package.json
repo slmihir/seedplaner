@@ -1,0 +1,61 @@
+{
+  "name": "seed-planner",
+  "version": "2.1.0",
+  "description": "A comprehensive Jira-like project management and issue tracking system with advanced features",
+  "keywords": ["project-management", "issue-tracking", "sprint-planning", "kanban", "scrum", "jira-alternative"],
+  "author": "SeedlingLabs",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:frontend\"",
+    "dev:api": "npm run dev --workspace=apps/api",
+    "dev:frontend": "npm run dev --workspace=apps/frontend",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "test:coverage": "npm run test:coverage --workspace=apps/api",
+    "test:e2e": "npm run cy:run --workspace=apps/frontend",
+    "test:e2e:open": "npm run cy:open --workspace=apps/frontend",
+    "lint": "npm run lint --workspaces",
+    "lint:fix": "npm run lint:fix --workspaces",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "seed": "node scripts/db/seed.js",
+    "seed:clean": "node scripts/db/seed.js",
+    "seed:verify": "node -e \"console.log('✅ Seed verification: Run npm run seed to verify database setup')\"",
+    "db:reset": "node scripts/db/seed.js",
+    "infra:deploy": "cd infra/scripts && ./deploy.sh apply",
+    "infra:destroy": "cd infra/scripts && ./deploy.sh destroy",
+    "infra:plan": "cd infra/scripts && ./deploy.sh plan",
+    "infra:output": "cd infra/scripts && ./deploy.sh output",
+    "install:all": "npm install --workspaces",
+    "start": "concurrently \"npm run start --workspace=apps/api\" \"npm run start --workspace=apps/frontend\"",
+    "clean": "npm run clean --workspaces && rm -rf node_modules",
+    "clean:all": "npm run clean --workspaces && rm -rf node_modules && rm -rf apps/*/node_modules",
+    "precommit": "npm run lint && npm run test && npm run build",
+    "setup": "npm install && npm run install:all && npm run seed",
+    "setup:dev": "npm run setup && npm run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "prettier": "^3.0.0",
+    "wait-on": "^7.2.0"
+  },
+  "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SeedlingLabs/seed-planner.git"
+  },
+  "homepage": "https://github.com/SeedlingLabs/seed-planner#readme",
+  "bugs": {
+    "url": "https://github.com/SeedlingLabs/seed-planner/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}
