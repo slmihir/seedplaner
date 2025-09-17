@@ -488,7 +488,7 @@ export default function EnhancedBoard() {
       >
         <Grid container spacing={2}>
           {Object.entries(columns).map(([status, issues]) => (
-            <Grid item xs={12} md={6} lg={3} key={status}>
+            <Grid size={{ xs: 12, md: 6, lg: 3 }} key={status}>
               <Paper sx={{ p: 2, minHeight: 400 }}>
                 <Box sx={{ 
                   p: 1, 

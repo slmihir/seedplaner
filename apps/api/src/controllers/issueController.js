@@ -301,11 +301,13 @@ const getIssueHierarchy = asyncHandler(async (req, res) => {
       }
     }
     
-    // Populate child issues if they exist
+    // Populate child issues if they exist (include key fields for UI)
     let childIssues = [];
     if (issue.childIssues && issue.childIssues.length > 0) {
       try {
-        childIssues = await Issue.find({ _id: { $in: issue.childIssues } }).select('key title type status');
+        childIssues = await Issue.find({ _id: { $in: issue.childIssues } })
+          .select('key title type status priority estimate assignees description')
+          .populate('assignees', 'name email');
       } catch (err) {
         console.warn('Failed to populate child issues:', err.message);
       }

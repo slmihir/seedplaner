@@ -43,7 +43,8 @@ const SimpleApiTester = () => {
     title: 'Test Subtask',
     description: 'Test subtask description',
     linkType: 'relates_to',
-    parentChild: ''
+    parentChild: '',
+    assignees: ''
   });
 
   const loadIssues = async () => {
@@ -77,7 +78,8 @@ const SimpleApiTester = () => {
     return await parentChildApi.createSubtask({
       title: testData.title,
       description: testData.description,
-      parentIssueId: testData.parentIssueId
+      parentIssueId: testData.parentIssueId,
+      assignees: testData.assignees
     });
   };
 
@@ -251,6 +253,14 @@ const SimpleApiTester = () => {
                 </Select>
               </FormControl>
             </Box>
+
+            <TextField
+              fullWidth
+              label="Assignees (comma-separated user IDs)"
+              value={testData.assignees}
+              onChange={(e) => setTestData({ ...testData, assignees: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
+              helperText="Optional: only project members are allowed"
+            />
           </Stack>
         </CardContent>
       </Card>

@@ -51,6 +51,7 @@ const SubtaskManager = ({ open, onClose, parentIssue, onSubtaskUpdate }) => {
   const [expandedSubtasks, setExpandedSubtasks] = useState(new Set());
   const [createDialog, setCreateDialog] = useState(false);
   const [editDialog, setEditDialog] = useState({ open: false, subtask: null });
+  const [projectMembers, setProjectMembers] = useState([]);
 
   // Form state for creating/editing subtasks
   const [formData, setFormData] = useState({
@@ -65,6 +66,7 @@ const SubtaskManager = ({ open, onClose, parentIssue, onSubtaskUpdate }) => {
   useEffect(() => {
     if (open && parentIssue) {
       loadSubtasks();
+      loadProjectMembers();
     }
   }, [open, parentIssue]);
 
@@ -81,6 +83,22 @@ const SubtaskManager = ({ open, onClose, parentIssue, onSubtaskUpdate }) => {
       setError('Failed to load subtasks');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadProjectMembers = async () => {
+    try {
+      // parentIssue.project can be populated or id; normalize
+      const projectId = parentIssue.project?._id || parentIssue.project;
+      if (!projectId) return;
+      const resp = await api.get(`/projects/${projectId}/members`);
+      const members = (resp.data.members || [])
+        .filter((m) => m && m.user)
+        .map((m) => ({ _id: m.user._id || m.user, name: m.user.name, email: m.user.email }));
+      setProjectMembers(members);
+    } catch (_) {
+      // Non-fatal for UI; leave members empty
+      setProjectMembers([]);
     }
   };
 
@@ -383,6 +401,29 @@ const SubtaskManager = ({ open, onClose, parentIssue, onSubtaskUpdate }) => {
               rows={3}
             />
             
+            <FormControl fullWidth sx={{ mt: 2 }}>
+              <InputLabel>Assignees</InputLabel>
+              <Select
+                multiple
+                value={formData.assignees}
+                onChange={(e) => setFormData({ ...formData, assignees: e.target.value })}
+                label="Assignees"
+                renderValue={(selected) => {
+                  const labels = selected
+                    .map((id) => projectMembers.find((u) => String(u._id) === String(id)))
+                    .filter(Boolean)
+                    .map((u) => u.name || u.email);
+                  return labels.join(', ');
+                }}
+              >
+                {projectMembers.map((u) => (
+                  <MenuItem key={u._id} value={u._id}>
+                    {u.name || u.email}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
             <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
               <FormControl sx={{ minWidth: 120 }}>
                 <InputLabel>Priority</InputLabel>
@@ -461,6 +502,29 @@ const SubtaskManager = ({ open, onClose, parentIssue, onSubtaskUpdate }) => {
               rows={3}
             />
             
+            <FormControl fullWidth sx={{ mt: 2 }}>
+              <InputLabel>Assignees</InputLabel>
+              <Select
+                multiple
+                value={formData.assignees}
+                onChange={(e) => setFormData({ ...formData, assignees: e.target.value })}
+                label="Assignees"
+                renderValue={(selected) => {
+                  const labels = selected
+                    .map((id) => projectMembers.find((u) => String(u._id) === String(id)))
+                    .filter(Boolean)
+                    .map((u) => u.name || u.email);
+                  return labels.join(', ');
+                }}
+              >
+                {projectMembers.map((u) => (
+                  <MenuItem key={u._id} value={u._id}>
+                    {u.name || u.email}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
             <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
               <FormControl sx={{ minWidth: 120 }}>
                 <InputLabel>Priority</InputLabel>
