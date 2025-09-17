@@ -194,7 +194,7 @@ const SubtaskManager = ({ open, onClose, parentIssue, onSubtaskUpdate }) => {
     setFormData({
       title: subtask.title,
       description: subtask.description || '',
-      assignees: subtask.assignees || [],
+      assignees: (subtask.assignees || []).map((a) => a?._id || a),
       estimate: subtask.estimate || '',
       priority: subtask.priority || 'medium',
       status: subtask.status || 'backlog'
@@ -333,7 +333,19 @@ const SubtaskManager = ({ open, onClose, parentIssue, onSubtaskUpdate }) => {
                           {subtask.assignees && subtask.assignees.length > 0 && (
                             <Box sx={{ mt: 1 }}>
                               <Typography variant="caption" color="text.secondary">
-                                Assigned to: {subtask.assignees.map(a => a.name || a.email).join(', ')}
+                                {(() => {
+                                  const labels = subtask.assignees
+                                    .map((a) => {
+                                      const id = a?._id || a;
+                                      const nameOrEmail = a?.name || a?.email;
+                                      if (nameOrEmail) return nameOrEmail;
+                                      const m = projectMembers.find((u) => String(u._id) === String(id));
+                                      return m ? (m.name || m.email) : undefined;
+                                    })
+                                    .filter(Boolean)
+                                    .join(', ');
+                                  return labels ? `Assigned to: ${labels}` : '';
+                                })()}
                               </Typography>
                             </Box>
                           )}
