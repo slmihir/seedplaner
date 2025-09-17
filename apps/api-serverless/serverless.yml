@@ -1,0 +1,384 @@
+service: seedplanner-api
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${opt:stage, 'dev'}
+  region: us-west-2
+  memorySize: 512
+  timeout: 30
+  environment:
+    STAGE: ${self:provider.stage}
+    DYNAMODB_TABLE: ${self:service}-${self:provider.stage}
+    JWT_SECRET: ${env:JWT_SECRET}
+    S3_BUCKET: ${self:service}-${self:provider.stage}-files
+    GITHUB_WEBHOOK_SECRET: ${env:GITHUB_WEBHOOK_SECRET}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:BatchGetItem
+            - dynamodb:BatchWriteItem
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}*"
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:PutObject
+            - s3:DeleteObject
+            - s3:GetObjectVersion
+          Resource: "arn:aws:s3:::${self:provider.environment.S3_BUCKET}/*"
+        - Effect: Allow
+          Action:
+            - s3:ListBucket
+          Resource: "arn:aws:s3:::${self:provider.environment.S3_BUCKET}"
+
+plugins:
+  - serverless-offline
+  - serverless-dynamodb-local
+
+custom:
+  serverless-offline:
+    httpPort: 4000
+  dynamodb:
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+
+functions:
+  # Auth Functions
+  login:
+    handler: src/handlers/auth/login.handler
+    events:
+      - http:
+          path: /auth/login
+          method: post
+          cors: true
+
+  register:
+    handler: src/handlers/auth/register.handler
+    events:
+      - http:
+          path: /auth/register
+          method: post
+          cors: true
+
+  refreshToken:
+    handler: src/handlers/auth/refresh.handler
+    events:
+      - http:
+          path: /auth/refresh
+          method: post
+          cors: true
+
+  # User Functions
+  getUsers:
+    handler: src/handlers/users/list.handler
+    events:
+      - http:
+          path: /users
+          method: get
+          cors: true
+
+  getUser:
+    handler: src/handlers/users/get.handler
+    events:
+      - http:
+          path: /users/{id}
+          method: get
+          cors: true
+
+  updateUser:
+    handler: src/handlers/users/update.handler
+    events:
+      - http:
+          path: /users/{id}
+          method: patch
+          cors: true
+
+  # Project Functions
+  createProject:
+    handler: src/handlers/projects/create.handler
+    events:
+      - http:
+          path: /projects
+          method: post
+          cors: true
+
+  getProjects:
+    handler: src/handlers/projects/list.handler
+    events:
+      - http:
+          path: /projects
+          method: get
+          cors: true
+
+  getProject:
+    handler: src/handlers/projects/get.handler
+    events:
+      - http:
+          path: /projects/{id}
+          method: get
+          cors: true
+
+  updateProject:
+    handler: src/handlers/projects/update.handler
+    events:
+      - http:
+          path: /projects/{id}
+          method: patch
+          cors: true
+
+  deleteProject:
+    handler: src/handlers/projects/delete.handler
+    events:
+      - http:
+          path: /projects/{id}
+          method: delete
+          cors: true
+
+  # Issue Functions
+  createIssue:
+    handler: src/handlers/issues/create.handler
+    events:
+      - http:
+          path: /issues
+          method: post
+          cors: true
+
+  getIssues:
+    handler: src/handlers/issues/list.handler
+    events:
+      - http:
+          path: /issues
+          method: get
+          cors: true
+
+  getIssue:
+    handler: src/handlers/issues/get.handler
+    events:
+      - http:
+          path: /issues/{id}
+          method: get
+          cors: true
+
+  updateIssue:
+    handler: src/handlers/issues/update.handler
+    events:
+      - http:
+          path: /issues/{id}
+          method: patch
+          cors: true
+
+  deleteIssue:
+    handler: src/handlers/issues/delete.handler
+    events:
+      - http:
+          path: /issues/{id}
+          method: delete
+          cors: true
+
+  # Sprint Functions
+  createSprint:
+    handler: src/handlers/sprints/create.handler
+    events:
+      - http:
+          path: /sprints
+          method: post
+          cors: true
+
+  getSprints:
+    handler: src/handlers/sprints/list.handler
+    events:
+      - http:
+          path: /sprints
+          method: get
+          cors: true
+
+  getSprint:
+    handler: src/handlers/sprints/get.handler
+    events:
+      - http:
+          path: /sprints/{id}
+          method: get
+          cors: true
+
+  updateSprint:
+    handler: src/handlers/sprints/update.handler
+    events:
+      - http:
+          path: /sprints/{id}
+          method: patch
+          cors: true
+
+  deleteSprint:
+    handler: src/handlers/sprints/delete.handler
+    events:
+      - http:
+          path: /sprints/{id}
+          method: delete
+          cors: true
+
+  # Board Functions
+  getBoard:
+    handler: src/handlers/boards/get.handler
+    events:
+      - http:
+          path: /boards
+          method: get
+          cors: true
+
+  # Cost Functions
+  createCost:
+    handler: src/handlers/costs/create.handler
+    events:
+      - http:
+          path: /costs
+          method: post
+          cors: true
+
+  getCosts:
+    handler: src/handlers/costs/list.handler
+    events:
+      - http:
+          path: /costs
+          method: get
+          cors: true
+
+  # GitHub Integration
+  githubWebhook:
+    handler: src/handlers/github/webhook.handler
+    events:
+      - http:
+          path: /github/webhook
+          method: post
+          cors: true
+
+  # System Config
+  getSystemConfig:
+    handler: src/handlers/system/config.handler
+    events:
+      - http:
+          path: /system-config
+          method: get
+          cors: true
+
+  updateSystemConfig:
+    handler: src/handlers/system/config.handler
+    events:
+      - http:
+          path: /system-config
+          method: patch
+          cors: true
+
+  # Project Config
+  getProjectConfig:
+    handler: src/handlers/projects/config.handler
+    events:
+      - http:
+          path: /project-config/{id}
+          method: get
+          cors: true
+
+  updateProjectConfig:
+    handler: src/handlers/projects/config.handler
+    events:
+      - http:
+          path: /project-config/{id}
+          method: patch
+          cors: true
+
+resources:
+  Resources:
+    # DynamoDB Table
+    SeedplannerTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+          - AttributeName: GSI1PK
+            AttributeType: S
+          - AttributeName: GSI1SK
+            AttributeType: S
+          - AttributeName: GSI2PK
+            AttributeType: S
+          - AttributeName: GSI2SK
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: GSI1
+            KeySchema:
+              - AttributeName: GSI1PK
+                KeyType: HASH
+              - AttributeName: GSI1SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: GSI2
+            KeySchema:
+              - AttributeName: GSI2PK
+                KeyType: HASH
+              - AttributeName: GSI2SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+    # S3 Bucket for file uploads
+    FilesBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.S3_BUCKET}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders: ['*']
+              AllowedMethods: [GET, PUT, POST, DELETE, HEAD]
+              AllowedOrigins: ['*']
+              MaxAge: 3600
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+
+  Outputs:
+    ApiGatewayRestApiId:
+      Value:
+        Ref: ApiGatewayRestApi
+      Export:
+        Name: ${self:service}-${self:provider.stage}-restApiId
+
+    ApiGatewayRestApiRootResourceId:
+      Value:
+        Fn::GetAtt:
+          - ApiGatewayRestApi
+          - RootResourceId
+      Export:
+        Name: ${self:service}-${self:provider.stage}-rootResourceId
+
+    DynamoDBTableName:
+      Value:
+        Ref: SeedplannerTable
+      Export:
+        Name: ${self:service}-${self:provider.stage}-tableName
+
+    S3BucketName:
+      Value:
+        Ref: FilesBucket
+      Export:
+        Name: ${self:service}-${self:provider.stage}-bucketName

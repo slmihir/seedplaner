@@ -1,0 +1,37 @@
+{
+  "name": "seedplanner-api-serverless",
+  "version": "1.0.0",
+  "description": "Serverless API for SeedPlanner project management system",
+  "main": "src/handlers/index.js",
+  "scripts": {
+    "deploy": "serverless deploy",
+    "deploy:dev": "serverless deploy --stage dev",
+    "deploy:prod": "serverless deploy --stage prod",
+    "offline": "serverless offline",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src/",
+    "clean": "rm -rf node_modules .serverless"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1500.0",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^3.0.2",
+    "joi": "^17.11.0",
+    "uuid": "^9.0.1",
+    "axios": "^1.11.0",
+    "csv-parser": "^3.2.0",
+    "exceljs": "^4.4.0"
+  },
+  "devDependencies": {
+    "serverless": "^3.38.0",
+    "serverless-offline": "^13.3.0",
+    "serverless-dynamodb-local": "^0.2.40",
+    "jest": "^29.7.0",
+    "eslint": "^8.55.0",
+    "supertest": "^7.1.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

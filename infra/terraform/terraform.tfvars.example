@@ -1,0 +1,90 @@
+# Example Terraform variables file
+# Copy this file to terraform.tfvars and update with your values
+
+# AWS Configuration
+aws_region     = "us-west-2"
+aws_account_id = "123456789012"  # Replace with your AWS Account ID
+
+# Environment
+environment = "production"  # or "staging", "development"
+
+# Project Configuration
+project_name = "seedplanner"
+
+# VPC Configuration
+vpc_cidr = "10.0.0.0/16"
+private_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24"]
+public_subnet_cidrs  = ["10.0.101.0/24", "10.0.102.0/24"]
+
+# Application Configuration
+jwt_secret = "your-super-secret-jwt-key-change-in-production"
+
+# GitHub Integration Configuration
+github_webhook_secret = "your-github-webhook-secret-change-in-production"
+github_app_id = "123456"  # Your GitHub App ID (if using GitHub App)
+github_private_key = "your-github-private-key"  # GitHub App private key (if using GitHub App)
+
+# File Upload Configuration
+max_file_upload_size = "10485760"  # 10MB in bytes
+allowed_file_types = "csv,xlsx,pdf,doc,docx,txt"
+
+# Report Generation Configuration
+enable_report_generation = true
+report_retention_days = 90
+
+# Database Configuration - Using AWS DocumentDB (Recommended)
+use_documentdb = true  # Set to false to use MongoDB Atlas instead
+
+# For MongoDB Atlas (when use_documentdb = false)
+mongodb_uri = "mongodb+srv://username:password@cluster.mongodb.net/seedplanner?retryWrites=true&w=majority"
+
+# For AWS DocumentDB (when use_documentdb = true) - RECOMMENDED
+mongodb_username = "admin"
+mongodb_password = "your-secure-password"
+mongodb_instance_class = "db.r5.large"  # Increased for better performance
+
+# ECS Fargate Configuration
+api_cpu     = 512   # Increased for better performance
+api_memory  = 1024  # Increased for better performance
+frontend_cpu    = 256
+frontend_memory = 512
+
+# Secrets Manager Configuration
+use_secrets_manager = true
+secrets_manager_secret_name = "seedplanner-app-secrets"
+
+# Lambda Configuration
+enable_lambda_functions = true
+lambda_timeout = 300
+lambda_memory_size = 512
+
+# Domain Configuration (optional)
+domain_name     = "seedplanner.example.com"
+certificate_arn = "arn:aws:acm:us-west-2:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+
+# Monitoring Configuration
+enable_monitoring    = true
+log_retention_days   = 30
+
+# Scaling Configuration
+min_capacity = 1
+max_capacity = 10
+target_cpu_utilization    = 70
+target_memory_utilization = 80
+
+# Security Configuration
+allowed_cidr_blocks = ["0.0.0.0/0"]  # Restrict this in production
+enable_waf = false
+
+# Backup Configuration
+backup_retention_period = 7
+backup_window = "07:00-09:00"
+
+# Additional Tags
+additional_tags = {
+  Owner       = "DevOps Team"
+  CostCenter  = "Engineering"
+  Project     = "SeedPlanner"
+  Environment = "Production"
+}
+
